@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow-Up Roulette Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #roulette {
+            margin: 20px auto;
+            width: 300px;
+            height: 300px;
+            border: 5px solid #333;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            background-color: #fff;
+        }
+        .segment {
+            width: 50%;
+            height: 50%;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform-origin: 0% 100%;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            text-align: right;
+            padding-right: 10px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 14px;
+            background-color: #f44336;
+            border-top: 2px solid #333;
+            border-bottom: 2px solid #333;
+        }
+        .segment:nth-child(2) { transform: rotate(36deg); background-color: #4caf50; }
+        .segment:nth-child(3) { transform: rotate(72deg); background-color: #2196f3; }
+        .segment:nth-child(4) { transform: rotate(108deg); background-color: #ff9800; }
+        .segment:nth-child(5) { transform: rotate(144deg); background-color: #9c27b0; }
+        .segment:nth-child(6) { transform: rotate(180deg); background-color: #ffeb3b; }
+        .segment:nth-child(7) { transform: rotate(216deg); background-color: #e91e63; }
+        .segment:nth-child(8) { transform: rotate(252deg); background-color: #00bcd4; }
+        .segment:nth-child(9) { transform: rotate(288deg); background-color: #673ab7; }
+        .segment:nth-child(10) { transform: rotate(324deg); background-color: #9e9e9e; }
+        #pointer {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 30px solid #333;
+            position: absolute;
+            top: -40px;
+            left: calc(50% - 20px);
+            z-index: 1;
+            transform: rotate(0deg);
+            transition: transform 4s ease-out;
+        }
+        #spinButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 2;
+            position: relative;
+        }
+        #spinButton:disabled {
+            background-color: #aaa;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .centered-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            z-index: 1;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Grow-Up Roulette Game</h1>
+    <div id="roulette">
+        <div class="segment">10JT</div>
+        <div class="segment">25JT</div>
+        <div class="segment">50JT</div>
+        <div class="segment">AI/BOT BINARY</div>
+        <div class="segment">GRUP SIGNAL</div>
+        <div class="segment">KELAS TRADING</div>
+        <div class="segment">ZONK</div>
+        <div class="segment">3JT</div>
+        <div class="segment">5JT</div>
+        <div class="segment">3 SPIN GRATIS</div>
+        <div class="segment">ZONK</div>
+        <div class="segment">3JT</div>
+        <div class="segment">5JT</div>
+        <div class="segment">AI/BOT BINARY</div>
+        <div class="segment">GRUP SIGNAL</div>
+        <div class="segment">KELAS TRADING</div>
+        <div class="segment">10JT</div>
+        <div class="segment">25JT</div>
+        <div class="segment">50JT</div>
+        <div class="segment">3 SPIN GRATIS</div>
+        <div id="pointer"></div>
+        <div id="resultText" class="centered-text">25JT</div>
+    </div>
+    <button id="spinButton" onclick="spin()">Spin</button>
+    <div id="message"></div>
+
+    <script>
+        function spin() {
+            // Mengecek apakah sudah pernah melakukan spin
+            if (sessionStorage.getItem('hasSpun')) {
+                document.getElementById('message').innerText = "You have already spun once!";
+                return;
+            }
+
+            // Menyimpan informasi bahwa telah melakukan spin
+            sessionStorage.setItem('hasSpun', 'true');
+
+            const now = new Date().getTime();
+
+            // Array segmen hadiah yang bisa dimenangkan
+            const segments = [
+                '10JT', '25JT', '50JT'
+            ];
+
+            // Menghasilkan hasil secara acak, namun selalu memilih antara 10JT, 25JT, atau 50JT
+            const result = '25JT';
+
+            // Menghitung derajat rotasi
+            const degrees = 144 + (Math.random() * 36); // Menentukan derajat acak di antara 144 sampai 180
+
+            // Menonaktifkan tombol spin selama animasi
+            document.getElementById('spinButton').disabled = true;
+
+            // Animasi roda roulette
+            document.getElementById('roulette').style.transition = "transform 4s ease-out";
+            document.getElementById('roulette').style.transform = `rotate(${3600 + degrees}deg)`;
+
+            // Mengatur posisi jarum penunjuk
+            const pointer = document.getElementById('pointer');
+            pointer.style.transform = `rotate(${degrees}deg)`;
+
+            // Menunggu animasi selesai
+            setTimeout(() => {
+                // Menampilkan hasil
+                document.getElementById('resultText').style.display = 'block';
+                document.getElementById('message').innerText = `You won: ${result}`;
+
+                // Mengaktifkan kembali tombol spin
+                document.getElementById('spinButton').disabled = false;
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grow-Up Roulette Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #000;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #roulette {
+            margin: 20px auto;
+            width: 300px;
+            height: 300px;
+            border: 5px solid #333;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            background-color: #fff;
+        }
+        .segment {
+            width: 50%;
+            height: 50%;
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform-origin: 0% 100%;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            text-align: right;
+            padding-right: 10px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #fff;
+            font-size: 14px;
+            background-color: #f44336;
+            border-top: 2px solid #333;
+            border-bottom: 2px solid #333;
+        }
+        .segment:nth-child(2) { transform: rotate(36deg); background-color: #4caf50; }
+        .segment:nth-child(3) { transform: rotate(72deg); background-color: #2196f3; }
+        .segment:nth-child(4) { transform: rotate(108deg); background-color: #ff9800; }
+        .segment:nth-child(5) { transform: rotate(144deg); background-color: #9c27b0; }
+        .segment:nth-child(6) { transform: rotate(180deg); background-color: #ffeb3b; }
+        .segment:nth-child(7) { transform: rotate(216deg); background-color: #e91e63; }
+        .segment:nth-child(8) { transform: rotate(252deg); background-color: #00bcd4; }
+        .segment:nth-child(9) { transform: rotate(288deg); background-color: #673ab7; }
+        .segment:nth-child(10) { transform: rotate(324deg); background-color: #9e9e9e; }
+        #pointer {
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 30px solid #333;
+            position: absolute;
+            top: -40px;
+            left: calc(50% - 20px);
+            z-index: 1;
+            transform: rotate(0deg);
+            transition: transform 4s ease-out;
+        }
+        #spinButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 2;
+            position: relative;
+        }
+        #spinButton:disabled {
+            background-color: #aaa;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .centered-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            z-index: 1;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Grow-Up Roulette Game</h1>
+    <div id="roulette">
+        <div class="segment">10JT</div>
+        <div class="segment">25JT</div>
+        <div class="segment">50JT</div>
+        <div class="segment">AI/BOT BINARY</div>
+        <div class="segment">GRUP SIGNAL</div>
+        <div class="segment">KELAS TRADING</div>
+        <div class="segment">ZONK</div>
+        <div class="segment">3JT</div>
+        <div class="segment">5JT</div>
+        <div class="segment">3 SPIN GRATIS</div>
+        <div class="segment">ZONK</div>
+        <div class="segment">3JT</div>
+        <div class="segment">5JT</div>
+        <div class="segment">AI/BOT BINARY</div>
+        <div class="segment">GRUP SIGNAL</div>
+        <div class="segment">KELAS TRADING</div>
+        <div class="segment">10JT</div>
+        <div class="segment">25JT</div>
+        <div class="segment">50JT</div>
+        <div class="segment">3 SPIN GRATIS</div>
+        <div id="pointer"></div>
+        <div id="resultText" class="centered-text">25JT</div>
+    </div>
+    <button id="spinButton" onclick="spin()">Spin</button>
+    <div id="message"></div>
+
+    <script>
+        function spin() {
+            // Mengecek apakah sudah pernah melakukan spin
+            if (sessionStorage.getItem('hasSpun')) {
+                document.getElementById('message').innerText = "You have already spun once!";
+                return;
+            }
+
+            // Menyimpan informasi bahwa telah melakukan spin
+            sessionStorage.setItem('hasSpun', 'true');
+
+            const now = new Date().getTime();
+
+            // Array segmen hadiah yang bisa dimenangkan
+            const segments = [
+                '10JT', '25JT', '50JT'
+            ];
+
+            // Menghasilkan hasil secara acak, namun selalu memilih antara 10JT, 25JT, atau 50JT
+            const result = '25JT';
+
+            // Menghitung derajat rotasi
+            const degrees = 144 + (Math.random() * 36); // Menentukan derajat acak di antara 144 sampai 180
+
+            // Menonaktifkan tombol spin selama animasi
+            document.getElementById('spinButton').disabled = true;
+
+            // Animasi roda roulette
+            document.getElementById('roulette').style.transition = "transform 4s ease-out";
+            document.getElementById('roulette').style.transform = `rotate(${3600 + degrees}deg)`;
+
+            // Mengatur posisi jarum penunjuk
+            const pointer = document.getElementById('pointer');
+            pointer.style.transform = `rotate(${degrees}deg)`;
+
+            // Menunggu animasi selesai
+            setTimeout(() => {
+                // Menampilkan hasil
+                document.getElementById('resultText').style.display = 'block';
+                document.getElementById('message').innerText = `You won: ${result}`;
+
+                // Mengaktifkan kembali tombol spin
+                document.getElementById('spinButton').disabled = false;
+            }, 4000);
+        }
+    </script>
+</body>
+</html>
