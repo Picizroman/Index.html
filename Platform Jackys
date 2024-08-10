@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Beranda Platform Trading Biner Opsi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: #1D0728;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow: hidden;
+            touch-action: manipulation;
+            font-size: 14px;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #3E1851;
+            padding: 10px 20px;
+            border-bottom: 1px solid #593068;
+        }
+        .navbar .logo {
+            width: 40px;
+            height: 40px;
+            background-color: #BD93F9;
+            border-radius: 5px;
+        }
+        .navbar .menu {
+            display: flex;
+            gap: 15px;
+        }
+        .navbar .menu .icon {
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .navbar .menu .icon:hover {
+            background-color: #593068;
+        }
+        .navbar .balance {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .balance-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .balance-item .icon {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .balance-item .icon:hover {
+            transform: scale(1.1);
+        }
+        .navbar .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .navbar .profile img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #BD93F9;
+        }
+        .navbar .profile button {
+            background-color: #804C89;
+            border: none;
+            padding: 8px 15px;
+            color: #ffffff;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .navbar .profile button:hover {
+            background-color: #BD93F9;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -250px;
+            width: 250px;
+            height: 100%;
+            background-color: #3E1851;
+            padding: 15px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            transition: left 0.3s ease;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .sidebar.active {
+            left: 0;
+        }
+        .sidebar .close-btn {
+            background-color: red;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #593068;
+            cursor: pointer;
+        }
+        .sidebar ul li:hover {
+            background-color: #804C89;
+        }
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            padding-bottom: 60px;
+        }
+        .chart {
+            width: calc(100% - 30px);
+            height: 300px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 1px solid #593068;
+            position: relative;
+            overflow: hidden;
+        }
+        .price-label {
+            position: absolute;
+            right: 40px;
+            top: 10px;
+            background-color: #3E1851;
+            color: #ffffff;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .trading-tools {
+            width: 90%;
+            background-color: #3E1851;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #593068;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .tool {
+            padding: 8px;
+            background-color: #593068;
+            border-radius: 5px;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+            height: 50px;
+        }
+        .tool:hover {
+            background-color: #804C89;
+        }
+        .dropdown {
+            display: none;
+            position: absolute;
+            background-color: #3E1851;
+            color: #ffffff;
+            min-width: 150px;
+            box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+            border: 1px solid #593068;
+        }
+        .dropdown a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+        }
+        .dropdown a:hover {
+            background-color: #5C3373;
+        }
+        .dropdown-active {
+            display: block;
+        }
+        .trading-buttons {
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .trading-buttons button {
+            flex: 1;
+            margin: 0 5px;
+            padding: 12px;
+            border: none;
+            color: #ffffff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .trading-buttons .buy {
+            background-color: #28a745;
+        }
+        .trading-buttons .buy:hover {
+            background-color: #218838;
+        }
+        .trading-buttons .sell {
+            background-color: #dc3545;
+        }
+        .trading-buttons .sell:hover {
+            background-color: #c82333;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #3E1851;
+            padding: 10px;
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #593068;
+        }
+        .footer .nav-item {
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            width: 25%;
+            transition: background-color 0.3s ease;
+        }
+        .footer .nav-item:hover {
+            background-color: #804C89;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #3E1851;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1100;
+            width: 80%;
+            max-width: 400px;
+            color: #ffffff;
+        }
+        .modal-header {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .modal-content {
+            margin-bottom: 15px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        .modal-button {
+            padding: 10px;
+            background-color: #804C89;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 48%;
+            text-align: center;
+        }
+        .modal-button:hover {
+            background-color: #BD93F9;
+        }
+        .modal-close {
+            background-color: red;
+        }
+        .modal-close:hover {
+            background-color: darkred;
+        }
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #593068;
+        }
+        .profit {
+            color: #28a745;
+        }
+        .loss {
+            color: #dc3545;
+        }
+        .indicator-line {
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        .horizontal-line {
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background-color: rgba(0, 255, 0, 0.7);
+        }
+        .vertical-line {
+            position: absolute;
+            width: 1px;
+            height: 100%;
+            background-color: rgba(128, 128, 128, 0.7);
+        }
+        .countdown-circle {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="menu">
+            <div class="icon" id="menu-icon">☰</div>
+        </div>
+        <div class="logo"></div>
+        <div class="balance">
+            <div class="balance-item" id="balance-display">
+                <span>Rp50,000,000 (Akun demo)</span>
+                <img src="icon-refresh.png" alt="Refresh" class="icon" id="icon-refresh-demo">
+            </div>
+        </div>
+        <div class="profile">
+            <button id="toggle-mode-btn">Ganti Mode</button>
+            <img src="profile.jpg" alt="Profil">
+        </div>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" id="close-btn">Tutup Sidebar</button>
+        <ul>
+            <li id="menu-history">Histori Transaksi</li>
+            <li id="menu-settings">Pengaturan</li>
+            <li id="menu-verification">Verifikasi</li>
+            <li id="menu-logout" class="logout">Logout</li>
+        </ul>
+    </div>
+
+    <!-- Modal untuk Histori Transaksi -->
+    <div id="modal-history" class="modal">
+        <div class="modal-header">Histori Transaksi</div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Waktu</th>
+                        <th>Jumlah Investasi</th>
+                        <th>Hasil</th>
+                    </tr>
+                </thead>
+                <tbody id="history-table">
+                    <!-- Data histori akan dimasukkan di sini -->
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button modal-close" id="close-history">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk Pengaturan -->
+    <div id="modal-settings" class="modal">
+        <div class="modal-header">Pengaturan</div>
+        <div class="modal-content">
+            <label>Ganti Foto Profil</label>
+            <input type="file" id="profile-photo" accept="image/*">
+        </div>
+        <div class="modal-content">
+            <label>Ganti Nama Akun</label>
+            <input type="text" id="account-name" placeholder="Nama Baru">
+        </div>
+        <div class="modal-content">
+            <label>Atur Ulang Kata Sandi</label>
+            <input type="password" id="old-password" placeholder="Kata Sandi Lama">
+            <input type="password" id="new-password" placeholder="Kata Sandi Baru">
+            <input type="password" id="confirm-password" placeholder="Ulangi Kata Sandi Baru">
+        </div>
+        <div class="modal-content">
+            <label>Pilihan Warna Grafik</label>
+            <select id="chart-color">
+                <option value="default">Default</option>
+                <option value="black">Hitam</option>
+                <option value="white">Putih</option>
+                <option value="blue">Biru</option>
+                <option value="yellow">Kuning</option>
+                <option value="brown">Cokelat</option>
+                <option value="pink">Pink</option>
+            </select>
+        </div>
+        <div class="modal-content">
+            <label>Ganti Email</label>
+            <input type="email" id="new-email" placeholder="Email Baru">
+        </div>
+        <div class="modal-content">
+            <label>Rekening Pembayaran</label>
+            <p>Nama Bank: <span id="bank-name">BCA</span></p>
+            <p>Nomor Rekening: <span id="account-number">1234567890</span></p>
+            <p>Nama Pemilik: <span id="account-owner">John Doe</span></p>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button" id="save-settings">Simpan</button>
+            <button class="modal-button modal-close" id="close-settings">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk Verifikasi -->
+    <div id="modal-verification" class="modal">
+        <div class="modal-header">Verifikasi</div>
+        <div class="modal-content">
+            <img src="profile.jpg" alt="Profil" class="profile-img">
+            <p>ID User: <span id="user-id">12345</span></p>
+            <p>Status Verifikasi: <span id="verification-status">Not Verified</span> <span class="verification-icon"></span></p>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button modal-close" id="close-verification">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk PIN -->
+    <div id="modal-pin" class="modal">
+        <div class="modal-header">Masukkan PIN</div>
+        <div class="modal-content">
+            <input type="password" id="pin-input" placeholder="PIN" maxlength="6">
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button" id="confirm-pin">Konfirmasi</button>
+            <button class="modal-button modal-close" id="close-pin">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk Pembuatan PIN -->
+    <div id="modal-create-pin" class="modal">
+        <div class="modal-header">Buat PIN</div>
+        <div class="modal-content">
+            <input type="password" id="create-pin" placeholder="Buat PIN" maxlength="6">
+            <input type="password" id="confirm-create-pin" placeholder="Konfirmasi PIN" maxlength="6">
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button" id="create-pin-btn">Buat PIN</button>
+            <button class="modal-button modal-close" id="close-create-pin">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk Jumlah Investasi -->
+    <div id="modal-investment" class="modal">
+        <div class="modal-header">Masukkan Jumlah Investasi</div>
+        <div class="modal-content">
+            <input type="number" id="investment-input" placeholder="Jumlah Investasi">
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button" id="confirm-investment">Konfirmasi</button>
+            <button class="modal-button modal-close" id="close-investment">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk Time Frame -->
+    <div id="modal-time-frame" class="modal">
+        <div class="modal-header">Pilih Time Frame</div>
+        <div class="modal-content">
+            <select id="time-frame-select">
+                <option value="10s">10 Detik</option>
+                <option value="30s">30 Detik</option>
+                <option value="1m">1 Menit</option>
+                <option value="30m">30 Menit</option>
+                <option value="1h">1 Jam</option>
+                <option value="12h">12 Jam</option>
+                <option value="24h">24 Jam</option>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button" id="confirm-time-frame">Konfirmasi</button>
+            <button class="modal-button modal-close" id="close-time-frame">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Modal untuk End Time -->
+    <div id="modal-end-time" class="modal">
+        <div class="modal-header">Pilih End Time</div>
+        <div class="modal-content">
+            <select id="end-time-select">
+                <option value="5">5 Detik</option>
+                <option value="10">10 Detik</option>
+                <option value="15">15 Detik</option>
+                <option value="30">30 Detik</option>
+                <option value="60">1 Menit</option>
+                <option value="300">5 Menit</option>
+                <option value="600">10 Menit</option>
+                <option value="1800">30 Menit</option>
+                <option value="3600">1 Jam</option>
+            </select>
+        </div>
+        <div class="modal-buttons">
+            <button class="modal-button" id="confirm-end-time">Konfirmasi</button>
+            <button class="modal-button modal-close" id="close-end-time">Tutup</button>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="chart">
+            <div id="tradingview_chart" style="width: 100%; height: 300px;"></div>
+            <div class="price-label" id="currentPrice">Rp 0</div>
+        </div>
+        <div class="trading-tools">
+            <div class="tool" id="tool-investment">Jumlah Investasi</div>
+            <div class="tool" id="tool-time-frame">Time Frame</div>
+            <div class="tool" id="tool-end-time">End Time</div>
+            <div class="tool" id="tool-indicator">Indikator</div>
+            <div class="tool" id="tool-ai-bot">AI/BOT Signal</div>
+            <div class="tool" id="tool-market">Market</div>
+        </div>
+        <div class="trading-buttons">
+            <button class="buy" id="buy-btn">Buy</button>
+            <button class="sell" id="sell-btn">Sell</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="nav-item" id="nav-home">Beranda</div>
+        <div class="nav-item" id="nav-wallet">Dompet</div>
+        <div class="nav-item" id="nav-services">Layanan</div>
+        <div class="nav-item" id="nav-account">Akun</div>
+    </div>
+
+    <script>
+        // Simulasi saldo
+        let saldoReal = 0;
+        let saldoDemo = 50000000;
+        let isDemoMode = true;
+        let userPin = localStorage.getItem('userPin') || null;
+        let currentInvestment = 0;
+        let selectedTimeFrame = '1m';
+        let endTime = 60;
+        let initialPrice;
+
+        // Sidebar functionality
+        document.getElementById('menu-icon').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+        document.getElementById('close-btn').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.remove('active');
+        });
+
+        // Ganti mode dengan PIN
+        document.getElementById('toggle-mode-btn').addEventListener('click', function() {
+            if (isDemoMode) {
+                if (userPin) {
+                    document.getElementById('modal-pin').style.display = 'block';
+                } else {
+                    document.getElementById('modal-create-pin').style.display = 'block';
+                }
+            } else {
+                isDemoMode = true;
+                updateMode();
+            }
+        });
+
+        // Konfirmasi PIN
+        document.getElementById('confirm-pin').addEventListener('click', function() {
+            const inputPin = document.getElementById('pin-input').value;
+            if (inputPin === userPin) {
+                isDemoMode = false;
+                updateMode();
+                document.getElementById('modal-pin').style.display = 'none';
+            } else {
+                alert('PIN salah! Silakan coba lagi atau request PIN baru.');
+            }
+        });
+
+        // Pembuatan PIN
+        document.getElementById('create-pin-btn').addEventListener('click', function() {
+            const createPin = document.getElementById('create-pin').value;
+            const confirmPin = document.getElementById('confirm-create-pin').value;
+            if (createPin && confirmPin && createPin === confirmPin) {
+                userPin = createPin;
+                localStorage.setItem('userPin', userPin);
+                isDemoMode = false;
+                updateMode();
+                document.getElementById('modal-create-pin').style.display = 'none';
+            } else {
+                alert('PIN tidak sesuai! Silakan coba lagi.');
+            }
+        });
+
+        // Update mode dan tampilan saldo
+        function updateMode() {
+            if (isDemoMode) {
+                document.getElementById('balance-display').innerHTML = `
+                    <span>Rp${saldoDemo.toLocaleString()} (Akun demo)</span>
+                    <img src="icon-refresh.png" alt="Refresh" class="icon" id="icon-refresh-demo">
+                `;
+                document.getElementById('icon-refresh-demo').addEventListener('click', function() {
+                    if (saldoDemo < 50000000) {
+                        saldoDemo = 50000000;
+                        alert('Saldo demo telah di-refresh menjadi Rp 50,000,000.');
+                        updateBalances();
+                    } else {
+                        alert('Saldo demo Anda masih mencukupi.');
+                    }
+                });
+            } else {
+                document.getElementById('balance-display').innerHTML = `
+                    <span>Rp${saldoReal.toLocaleString()} (Akun real)</span>
+                `;
+            }
+        }
+
+        // Update saldo pada UI
+        function updateBalances() {
+            if (isDemoMode) {
+                document.querySelector('#balance-display span').textContent = `Rp${saldoDemo.toLocaleString()} (Akun demo)`;
+            } else {
+                document.querySelector('#balance-display span').textContent = `Rp${saldoReal.toLocaleString()} (Akun real)`;
+            }
+        }
+
+        // Fungsi untuk modal Jumlah Investasi
+        document.getElementById('tool-investment').addEventListener('click', function() {
+            document.getElementById('modal-investment').style.display = 'block';
+        });
+        document.getElementById('confirm-investment').addEventListener('click', function() {
+            currentInvestment = parseFloat(document.getElementById('investment-input').value);
+            document.getElementById('modal-investment').style.display = 'none';
+            alert(`Jumlah investasi telah ditetapkan sebesar Rp${currentInvestment.toLocaleString()}`);
+        });
+
+        // Fungsi untuk modal Time Frame
+        document.getElementById('tool-time-frame').addEventListener('click', function() {
+            document.getElementById('modal-time-frame').style.display = 'block';
+        });
+        document.getElementById('confirm-time-frame').addEventListener('click', function() {
+            selectedTimeFrame = document.getElementById('time-frame-select').value;
+            document.getElementById('modal-time-frame').style.display = 'none';
+            alert(`Time frame telah dipilih: ${selectedTimeFrame}`);
+            updateChart();
+        });
+
+        // Fungsi untuk modal End Time
+        document.getElementById('tool-end-time').addEventListener('click', function() {
+            document.getElementById('modal-end-time').style.display = 'block';
+        });
+        document.getElementById('confirm-end-time').addEventListener('click', function() {
+            endTime = parseInt(document.getElementById('end-time-select').value, 10);
+            document.getElementById('modal-end-time').style.display = 'none';
+            alert(`End Time diatur ke ${endTime} detik`);
+        });
+
+        // Fungsi untuk dropdown
+        document.getElementById('tool-indicator').addEventListener('click', function() {
+            toggleDropdown('tool-indicator', ['Moving Average', 'MACD', 'RSI', 'Bollinger Bands']);
+        });
+
+        document.getElementById('tool-ai-bot').addEventListener('click', function() {
+            toggleDropdown('tool-ai-bot', ['AI Signal', 'Bot Trading']);
+        });
+
+        document.getElementById('tool-market').addEventListener('click', function() {
+            toggleDropdown('tool-market', ['Forex', 'Crypto', 'Commodities', 'Indices']);
+        });
+
+        function toggleDropdown(elementId, options) {
+            const element = document.getElementById(elementId);
+            let dropdown = element.querySelector('.dropdown');
+            if (!dropdown) {
+                dropdown = document.createElement('div');
+                dropdown.className = 'dropdown';
+                options.forEach(option => {
+                    const link = document.createElement('a');
+                    link.href = '#';
+                    link.innerText = option;
+                    link.addEventListener('click', () => {
+                        document.querySelectorAll(`#${elementId} .dropdown a`).forEach(a => a.classList.remove('active'));
+                        link.classList.add('active');
+                        updateChart();
+                    });
+                    dropdown.appendChild(link);
+                });
+                element.appendChild(dropdown);
+            }
+            dropdown.classList.toggle('dropdown-active');
+        }
+
+        // Fungsi untuk mencatat transaksi
+        function recordTransaction(type, amount, accountType) {
+            const date = new Date();
+            const transaction = {
+                date: date.toLocaleDateString(),
+                time: date.toLocaleTimeString(),
+                amount: `Rp${parseFloat(amount).toLocaleString()}`,
+                type: type,
+                account: accountType
+            };
+            addTransactionToHistory(transaction);
+        }
+
+        // Menambahkan transaksi ke riwayat dagang
+        function addTransactionToHistory(transaction) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${transaction.date}</td>
+                <td>${transaction.time}</td>
+                <td>${transaction.amount}</td>
+                <td class="${transaction.type === 'profit' ? 'profit' : 'loss'}">${transaction.type === 'profit' ? 'Profit' : 'Loss'}</td>
+            `;
+            document.getElementById('history-table').appendChild(row);
+        }
+
+        // Pencegahan zoom
+        document.addEventListener('touchstart', function(e) {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
+
+        // Fungsi untuk menghubungkan alat trading dengan TradingView
+        function updateChart() {
+            const selectedMarket = document.querySelector('#tool-market .dropdown a.active')?.innerText || 'BTCUSDT';
+            const interval = selectedTimeFrame === '1m' ? '1' : selectedTimeFrame;
+
+            new TradingView.widget({
+                "container_id": "tradingview_chart",
+                "width": "100%",
+                "height": "300",
+                "symbol": `BINANCE:${selectedMarket}`,
+                "interval": interval,
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "id",
+                "toolbar_bg": "#1D0728",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "studies": ["MASimple@tv-basicstudies"],
+                "hide_side_toolbar": false,
+                "details": true,
+                "hotlist": true,
+                "calendar": true
+            });
+        }
+
+        // Modal functionality
+        const modals = document.querySelectorAll('.modal');
+        const modalButtons = document.querySelectorAll('.modal-button, .modal-close');
+
+        modalButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                modals.forEach(modal => modal.style.display = 'none');
+            });
+        });
+
+        document.getElementById('menu-history').addEventListener('click', function() {
+            document.getElementById('modal-history').style.display = 'block';
+        });
+
+        document.getElementById('menu-settings').addEventListener('click', function() {
+            document.getElementById('modal-settings').style.display = 'block';
+        });
+
+        document.getElementById('menu-verification').addEventListener('click', function() {
+            document.getElementById('modal-verification').style.display = 'block';
+        });
+
+        document.getElementById('menu-logout').addEventListener('click', function() {
+            window.location.href = 'form-login.html';
+        });
+
+        // Simulate loading history data
+        const historyTable = document.getElementById('history-table');
+        const dummyHistory = [
+            { date: '2023-06-01', time: '10:00', investment: 'Rp 1,000,000', result: 'profit' },
+            { date: '2023-06-02', time: '11:00', investment: 'Rp 2,000,000', result: 'loss' },
+        ];
+        dummyHistory.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${record.date}</td>
+                <td>${record.time}</td>
+                <td>${record.investment}</td>
+                <td class="${record.result}">${record.result === 'profit' ? 'Profit' : 'Loss'}</td>
+            `;
+            historyTable.appendChild(row);
+        });
+
+        // Update profile photo and account settings
+        document.getElementById('save-settings').addEventListener('click', function() {
+            const photo = document.getElementById('profile-photo').files[0];
+            const name = document.getElementById('account-name').value;
+            const oldPassword = document.getElementById('old-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const chartColor = document.getElementById('chart-color').value;
+            const email = document.getElementById('new-email').value;
+
+            // Simulate saving the settings
+            if (photo) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.querySelector('.navbar .profile img').src = e.target.result;
+                    localStorage.setItem('profilePhoto', e.target.result);
+                };
+                reader.readAsDataURL(photo);
+            }
+            if (name) {
+                alert(`Nama akun diubah menjadi: ${name}`);
+                localStorage.setItem('accountName', name);
+            }
+            if (newPassword && newPassword === confirmPassword) {
+                alert('Kata sandi berhasil diubah');
+                localStorage.setItem('userPassword', newPassword);
+            }
+            if (chartColor) {
+                alert(`Warna grafik diubah menjadi: ${chartColor}`);
+                changeChartColor(chartColor);
+                localStorage.setItem('chartColor', chartColor);
+            }
+            if (email) {
+                alert(`Email diubah menjadi: ${email}`);
+                localStorage.setItem('userEmail', email);
+            }
+        });
+
+        // Fungsi untuk menyembunyikan semua modal
+        function hideAllModals() {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+
+        // Menutup modal ketika klik di luar modal
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                hideAllModals();
+            }
+        };
+
+        // Inisialisasi halaman dengan memuat pengaturan dan saldo
+        function loadSettings() {
+            const profilePhoto = localStorage.getItem('profilePhoto');
+            const accountName = localStorage.getItem('accountName');
+            const chartColor = localStorage.getItem('chartColor');
+            const userEmail = localStorage.getItem('userEmail');
+
+            if (profilePhoto) {
+                document.querySelector('.navbar .profile img').src = profilePhoto;
+            }
+            if (accountName) {
+                document.getElementById('account-name').value = accountName;
+            }
+            if (chartColor) {
+                changeChartColor(chartColor);
+                document.getElementById('chart-color').value = chartColor;
+            }
+            if (userEmail) {
+                document.getElementById('new-email').value = userEmail;
+            }
+        }
+
+        function changeChartColor(color) {
+            const chartContainer = document.getElementById('tradingview_chart');
+            chartContainer.innerHTML = ''; // Clear current chart
+            new TradingView.widget({
+                "container_id": "tradingview_chart",
+                "width": "100%",
+                "height": "300",
+                "symbol": `BINANCE:BTCUSDT`,
+                "interval": selectedTimeFrame,
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "id",
+                "toolbar_bg": color === 'default' ? '#1D0728' : color,
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "studies": ["MASimple@tv-basicstudies"],
+                "hide_side_toolbar": false,
+                "details": true,
+                "hotlist": true,
+                "calendar": true
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            updateBalances();
+            updateMode();
+            updateChart();
+        });
+        
+        
+
+        // Fungsi untuk tombol buy dan sell
+        document.getElementById('buy-btn').addEventListener('click', function() {
+            if (currentInvestment <= 0) {
+                alert('Tentukan jumlah investasi terlebih dahulu.');
+                return;
+            }
+            openTrade('buy');
+        });
+
+        document.getElementById('sell-btn').addEventListener('click', function() {
+            if (currentInvestment <= 0) {
+                alert('Tentukan jumlah investasi terlebih dahulu.');
+                return;
+            }
+            openTrade('sell');
+        });
+
+        function openTrade(type) {
+            const investmentAmount = currentInvestment;
+            const verticalLine = document.createElement('div');
+            verticalLine.className = 'vertical-line';
+            verticalLine.style.left = `calc(100% - 30px)`; // Adjusted to fit within chart
+            document.querySelector('.chart').appendChild(verticalLine);
+
+            const horizontalLine = document.createElement('div');
+            horizontalLine.className = 'horizontal-line';
+            horizontalLine.style.top = `${document.querySelector('.chart').clientHeight - 10}px`; // Adjust to fit within chart
+            horizontalLine.style.backgroundColor = type === 'buy' ? 'rgba(0, 255, 0, 0.7)' : 'rgba(255, 0, 0, 0.7)';
+            document.querySelector('.chart').appendChild(horizontalLine);
+
+            const countdownCircle = document.createElement('div');
+            countdownCircle.className = 'countdown-circle';
+            countdownCircle.style.left = `calc(100% - 60px)`; // Adjusted to fit within chart
+            countdownCircle.style.top = `${document.querySelector('.chart').clientHeight - 40}px`; // Adjust to fit within chart
+            countdownCircle.innerText = endTime;
+            document.querySelector('.chart').appendChild(countdownCircle);
+
+            let countdown = endTime;
+            const interval = setInterval(() => {
+                countdown -= 1;
+                countdownCircle.innerText = countdown;
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    document.querySelector('.chart').removeChild(verticalLine);
+                    document.querySelector('.chart').removeChild(horizontalLine);
+                    document.querySelector('.chart').removeChild(countdownCircle);
+                    evaluateTrade(type, investmentAmount);
+                }
+            }, 1000);
+        }
+
+        function evaluateTrade(type, investmentAmount) {
+            const finalPriceText = document.getElementById('currentPrice').innerText.replace('Rp', '').replace(/,/g, '').trim();
+            const finalPrice = parseFloat(finalPriceText);
+
+            const initialPriceText = document.querySelector('.price-label').dataset.initialPrice;
+            const initialPrice = parseFloat(initialPriceText);
+
+            if ((type === 'buy' && finalPrice > initialPrice) || (type === 'sell' && finalPrice < initialPrice)) {
+                alert('Profit!');
+                if (isDemoMode) {
+                    saldoDemo += investmentAmount * 1.1;
+                } else {
+                    saldoReal += investmentAmount * 1.1;
+                }
+                recordTransaction('profit', investmentAmount, isDemoMode ? 'demo' : 'real');
+            } else {
+                alert('Loss!');
+                if (isDemoMode) {
+                    saldoDemo -= investmentAmount;
+                    if (saldoDemo <= 0) {
+                        alert('Klik tombol refresh untuk menambah saldo akun demo Anda.');
+                    }
+                } else {
+                    saldoReal -= investmentAmount;
+                }
+                recordTransaction('loss', investmentAmount, isDemoMode ? 'demo' : 'real');
+            }
+            updateBalances();
+        }
+
+        // Fungsi untuk memuat pengaturan awal halaman dompet
+        document.getElementById('nav-wallet').addEventListener('click', function() {
+            window.location.href = 'dompet.html'; // Asumsikan ini adalah halaman dompet
+        });
+
+        // Fungsi untuk memuat pengaturan awal halaman layanan
+        document.getElementById('nav-services').addEventListener('click', function() {
+            window.location.href = 'layanan.html'; // Asumsikan ini adalah halaman layanan
+        });
+
+        // Fungsi untuk memuat pengaturan awal halaman akun
+        document.getElementById('nav-account').addEventListener('click', function() {
+            window.location.href = 'akun.html'; // Asumsikan ini adalah halaman akun
+        });
+
+        // Fungsi untuk memuat pengaturan awal halaman beranda
+        document.getElementById('nav-home').addEventListener('click', function() {
+            window.location.href = 'beranda.html'; // Asumsikan ini adalah halaman beranda
+        });
+
+        // Menambahkan event listener untuk tombol modal
+        document.getElementById('close-history').addEventListener('click', hideAllModals);
+        document.getElementById('close-settings').addEventListener('click', hideAllModals);
+        document.getElementById('close-verification').addEventListener('click', hideAllModals);
+        document.getElementById('close-pin').addEventListener('click', hideAllModals);
+        document.getElementById('close-create-pin').addEventListener('click', hideAllModals);
+        document.getElementById('close-investment').addEventListener('click', hideAllModals);
+        document.getElementById('close-time-frame').addEventListener('click', hideAllModals);
+        document.getElementById('close-end-time').addEventListener('click', hideAllModals);
+
+        // Fungsi untuk memperbarui grafik sesuai dengan time frame yang dipilih
+        function updateChart() {
+            const selectedMarket = document.querySelector('#tool-market .dropdown a.active')?.innerText || 'BTCUSDT';
+            const interval = selectedTimeFrame === '1m' ? '1' : selectedTimeFrame;
+
+            new TradingView.widget({
+                "container_id": "tradingview_chart",
+                "width": "100%",
+                "height": "300",
+                "symbol": `BINANCE:${selectedMarket}`,
+                "interval": interval,
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "id",
+                "toolbar_bg": "#1D0728",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "studies": ["MASimple@tv-basicstudies"],
+                "hide_side_toolbar": false,
+                "details": true,
+                "hotlist": true,
+                "calendar": true
+            });
+        }
+
+        // Fungsi untuk menyimpan histori transaksi ke local storage
+        function saveTransactionHistory() {
+            const transactions = document.querySelectorAll('#history-table tr');
+            const historyData = [];
+            transactions.forEach(tr => {
+                const cells = tr.querySelectorAll('td');
+                historyData.push({
+                    date: cells[0].innerText,
+                    time: cells[1].innerText,
+                    amount: cells[2].innerText,
+                    type: cells[3].innerText
+                });
+            });
+            localStorage.setItem('transactionHistory', JSON.stringify(historyData));
+        }
+
+        // Fungsi untuk memuat histori transaksi dari local storage
+        function loadTransactionHistory() {
+            const historyData = JSON.parse(localStorage.getItem('transactionHistory') || '[]');
+            historyData.forEach(record => {
+                addTransactionToHistory(record);
+            });
+        }
+
+        // Panggil fungsi loadTransactionHistory saat halaman dimuat
+        window.onload = function() {
+            loadTransactionHistory();
+            loadSettings();
+            updateBalances();
+            updateMode();
+            updateChart();
+        };
+    </script>
+</body>
+</html>
